@@ -77,7 +77,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="JAVA," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -93,19 +93,16 @@
 
 
 
-<meta name="description" content="前言在回顾Java线程相关知识点时，发现互联网上很多不负责任的文章将Java线程状态与操作系统线程状态混为一谈，极为混乱，极大的误导了读者；故在此做一个详细的梳理；也望读者不要轻易相信互联网上的文章，最好亲自查证。 虚拟机线程状态 vs 操作系统线程状态Java线程状态指的是虚拟机层面暴露给开发者使用的状态，由Thread.State类定义。底层由于操作系统的千差万别，各操作系统对于线程也有不同的">
-<meta name="keywords" content="JAVA">
+<meta name="description" content="Spring事务传播性 A (Atomacity)  原子性 一个事务（transaction）中的所有操作，要么全部完成，要么全部不完成，不会结束在中间某个环节。事务在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。  C (Consistency) 一致性 在事务开始之前和事务结束以后，数据库的完整性没有被破坏。这表示写入的资料必须完全符合所">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Java线程状态与操作系统进(线)程状态">
-<meta property="og:url" content="http://charleywu.com/2017/07/27/Java线程状态与操作系统进（线）程状态/index.html">
+<meta property="og:title" content="数据库事务">
+<meta property="og:url" content="http://charleywu.com/2017/08/03/Spring事务特性/index.html">
 <meta property="og:site_name" content="TickTock Ideas">
-<meta property="og:description" content="前言在回顾Java线程相关知识点时，发现互联网上很多不负责任的文章将Java线程状态与操作系统线程状态混为一谈，极为混乱，极大的误导了读者；故在此做一个详细的梳理；也望读者不要轻易相信互联网上的文章，最好亲自查证。 虚拟机线程状态 vs 操作系统线程状态Java线程状态指的是虚拟机层面暴露给开发者使用的状态，由Thread.State类定义。底层由于操作系统的千差万别，各操作系统对于线程也有不同的">
-<meta property="og:image" content="http://charleywu.com/2017/07/27/images/ThreadStateTransform.png">
-<meta property="og:updated_time" content="2017-08-08T06:24:01.000Z">
+<meta property="og:description" content="Spring事务传播性 A (Atomacity)  原子性 一个事务（transaction）中的所有操作，要么全部完成，要么全部不完成，不会结束在中间某个环节。事务在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。  C (Consistency) 一致性 在事务开始之前和事务结束以后，数据库的完整性没有被破坏。这表示写入的资料必须完全符合所">
+<meta property="og:updated_time" content="2017-08-07T08:26:56.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Java线程状态与操作系统进(线)程状态">
-<meta name="twitter:description" content="前言在回顾Java线程相关知识点时，发现互联网上很多不负责任的文章将Java线程状态与操作系统线程状态混为一谈，极为混乱，极大的误导了读者；故在此做一个详细的梳理；也望读者不要轻易相信互联网上的文章，最好亲自查证。 虚拟机线程状态 vs 操作系统线程状态Java线程状态指的是虚拟机层面暴露给开发者使用的状态，由Thread.State类定义。底层由于操作系统的千差万别，各操作系统对于线程也有不同的">
-<meta name="twitter:image" content="http://charleywu.com/2017/07/27/images/ThreadStateTransform.png">
+<meta name="twitter:title" content="数据库事务">
+<meta name="twitter:description" content="Spring事务传播性 A (Atomacity)  原子性 一个事务（transaction）中的所有操作，要么全部完成，要么全部不完成，不会结束在中间某个环节。事务在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。  C (Consistency) 一致性 在事务开始之前和事务结束以后，数据库的完整性没有被破坏。这表示写入的资料必须完全符合所">
 
 
 
@@ -133,13 +130,13 @@
 
 
 
-  <link rel="canonical" href="http://charleywu.com/2017/07/27/Java线程状态与操作系统进（线）程状态/"/>
+  <link rel="canonical" href="http://charleywu.com/2017/08/03/Spring事务特性/"/>
 
 
 
 
 
-  <title>Java线程状态与操作系统进(线)程状态 | TickTock Ideas</title>
+  <title>数据库事务 | TickTock Ideas</title>
   
 
 
@@ -258,7 +255,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://charleywu.com/2017/07/27/Java线程状态与操作系统进（线）程状态/">
+    <link itemprop="mainEntityOfPage" href="http://charleywu.com/2017/08/03/Spring事务特性/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Charley Wu">
@@ -275,7 +272,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Java线程状态与操作系统进(线)程状态</h1>
+          <h1 class="post-title" itemprop="name headline">数据库事务</h1>
         
 
         <div class="post-meta">
@@ -287,8 +284,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-27T10:42:00+08:00">
-                2017-07-27
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-03T10:03:46+08:00">
+                2017-08-03
               </time>
             
 
@@ -322,73 +319,82 @@
       
 
       
-        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在回顾Java线程相关知识点时，发现互联网上很多不负责任的文章将Java线程状态与操作系统线程状态混为一谈，极为混乱，极大的误导了读者；故在此做一个详细的梳理；也望读者不要轻易相信互联网上的文章，最好亲自查证。</p>
-<h3 id="虚拟机线程状态-vs-操作系统线程状态"><a href="#虚拟机线程状态-vs-操作系统线程状态" class="headerlink" title="虚拟机线程状态 vs 操作系统线程状态"></a>虚拟机线程状态 vs 操作系统线程状态</h3><p>Java线程状态指的是虚拟机层面暴露给开发者使用的状态，由Thread.State类定义。底层由于操作系统的千差万别，各操作系统对于线程也有不同的状态，有可能操作系统线程多个状态对应一个Java线程状态；虚拟机的存在就是统一了底层的这些差别，让开发者不必关心这些问题。</p>
-<h3 id="Java线程状态"><a href="#Java线程状态" class="headerlink" title="Java线程状态"></a>Java线程状态</h3><p>自JDK1.5开始，Java在Thread；且在给定时间点上，一个线程只能处于这6种状态中的一种。</p>
+        <h3 id="Spring事务传播性"><a href="#Spring事务传播性" class="headerlink" title="Spring事务传播性"></a>Spring事务传播性</h3><ul>
+<li><p><strong>A (Atomacity)  原子性</strong></p>
+<p>一个事务（transaction）中的所有操作，要么全部完成，要么全部不完成，不会结束在中间某个环节。事务在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。</p>
+</li>
+<li><p><strong>C (Consistency) 一致性</strong></p>
+<p>在事务开始之前和事务结束以后，数据库的完整性没有被破坏。这表示写入的资料必须完全符合所有的预设规则，这包含资料的精确度、串联性以及后续数据库可以自发性地完成预定的工作。</p>
+</li>
+<li><p><strong>I (Isolation) 隔离性</strong></p>
+<p>数据库允许多个并发事务同时对其数据进行读写和修改的能力，隔离性可以防止多个事务并发执行时由于交叉执行而导致数据的不一致。事务隔离分为不同级别，包括读未提交（Read uncommitted）、读提交（read committed）、可重复读（repeatable read）和串行化（Serializable）。</p>
+</li>
+<li><p><strong>D (Durability) 持久性</strong></p>
+<p>事务处理结束后，对数据的修改就是永久的，即便系统故障也不会丢失。</p>
+</li>
+</ul>
+<h3 id="事务隔离级别"><a href="#事务隔离级别" class="headerlink" title="事务隔离级别"></a>事务隔离级别</h3><p>在标准SQL规范中，定义了4个事务隔离级别，（ Oracle 和 SQL Server 对标准隔离级别有不同的实现 ）</p>
 <ul>
-<li><p><strong>NEW</strong></p>
-<blockquote>
-<p>Thread state for a thread which has not yet started.</p>
-</blockquote>
+<li><p><strong>未提交读 (Read Uncommitted)</strong></p>
+<p>直译就是”读未提交”，意思就是即使一个更新语句没有提交，但是别的事务可以读到这个改变。Read Uncommitted允许脏读。</p>
+</li>
+<li><p><strong>已提交读 (Read Committed)</strong></p>
+<p>直译就是”读提交”，意思就是语句提交以后，即执行了 Commit 以后别的事务就能读到这个改变，只能读取到已经提交的数据。Oracle等多数数据库默认都是该级别。Read Commited 不允许脏读，但会出现非重复读。</p>
+</li>
+<li><p><strong>可重复读 (Repeatable Read)</strong></p>
+<p>直译就是”可以重复读”，这是说在同一个事务里面先后执行同一个查询语句的时候，得到的结果是一样的。Repeatable Read 不允许脏读，不允许非重复读，但是会出现幻象读。</p>
 </li>
 </ul>
 <ul>
-<li><p><strong>RUNNABLE</strong></p>
-<blockquote>
-<p>Thread state for a runnable thread. A thread in the runnable state is executing in the Java virtual machine but it may be waiting for other resources from the operating system such as processor.</p>
-</blockquote>
-</li>
-<li><p><strong>BOLCKED</strong></p>
-<blockquote>
-<p>Thread state for a thread blocked waiting for a monitor lock. A thread in the blocked state is waiting for a monitor lock to enter a synchronized block/method or reenter a synchronized block/method after calling<code>Object.wait</code>.</p>
+<li><p><strong>串行读 (Serializable)</strong></p>
+<p>直译就是”序列化”，意思是说这个事务执行的时候不允许别的事务并发执行。完全串行化的读，每次读都需要获得表级共享锁，读写相互都会阻塞。Serializable 不允许不一致现象的出现。</p>
 <p>​</p>
-</blockquote>
-</li>
-<li><p><strong>WAITING</strong></p>
-<blockquote>
-<p>Thread state for a waiting thread. A thread is in the waiting state due to calling one of the following methods:</p>
-<ul>
-<li><code>Object.wait</code> with no timeout</li>
-<li><code>Thread.join</code> with no timeout</li>
-<li><code>LockSupport.park</code></li>
-</ul>
-<p>A thread in the waiting state is waiting for another thread to perform a particular action. For example, a thread that has called <code>Object.wait()</code> on an object is waiting for another thread to call <code>Object.notify()</code> or <code>Object.notifyAll()</code> on that object. A thread that has called <code>Thread.join()</code> is waiting for a specified thread to terminate.</p>
-<p>​</p>
-</blockquote>
 </li>
 </ul>
+<p><em>几种隔离级别可能出现的异常场景:</em></p>
+<table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>脏读</th>
+<th>不可重复读</th>
+<th>幻读</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>未提交读</td>
+<td>可能</td>
+<td>可能</td>
+<td>可能</td>
+</tr>
+<tr>
+<td>已提交读</td>
+<td>不可能</td>
+<td>可能</td>
+<td>可能</td>
+</tr>
+<tr>
+<td>可重复读</td>
+<td>不可能</td>
+<td>不可能</td>
+<td>可能</td>
+</tr>
+<tr>
+<td>串行化</td>
+<td>不可能</td>
+<td>不可能</td>
+<td>不可能</td>
+</tr>
+</tbody>
+</table>
 <ul>
-<li><p><strong>TIMED_WAITING</strong></p>
-<blockquote>
-<p>Thread state for a waiting thread with a specified waiting time. A thread is in the timed waiting state due to calling one of the following methods with a specified positive waiting time:</p>
-<ul>
-<li><code>Thread.sleep</code></li>
+<li><strong>脏读 (Dirty Read)：</strong>A 事务读到 B 事务未提交的修改。</li>
+<li><strong>不可重复读 (NonRepeatable Read)：</strong>A 事务还没有结束时，B 事务也访问同一数据。在 A 事务的两次读取之间，由于 B 事务的修改，A 事务两次读到的数据可能是不一样的。</li>
+<li><strong>幻读 (Phantom Read)：</strong>A 事务对一个表中的数据进行了修改，这种修改涉及到表中的全部数据行。同时，B 事务也修改这个表中的数据，这种修改是向表中插入一行新数据。操作 A 事务的用户发现表中出现了 B 事务插入的行，就好象发生了幻觉一样。</li>
 </ul>
-<ul>
-<li><code>Object.wait</code> with timeout</li>
-</ul>
-<ul>
-<li><code>Thread.join</code> with timeout</li>
-</ul>
-<ul>
-<li><code>LockSupport.parkNanos</code></li>
-</ul>
-<ul>
-<li><code>LockSupport.parkUntil</code></li>
-</ul>
-</blockquote>
-</li>
-</ul>
-<ul>
-<li><p><strong>TERMINATED</strong></p>
-<blockquote>
-<p>Thread state for a terminated thread. The thread has completed execution.</p>
-</blockquote>
-</li>
-</ul>
-<p><em>Oracle官方文档片段</em></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">public static enum Thread.State</div><div class="line">extends Enum&lt;Thread.State&gt;</div><div class="line">  </div><div class="line">A thread state. A thread can be in one of the following states:</div><div class="line">    NEW</div><div class="line">    A thread that has not yet started is in this state.</div><div class="line">    RUNNABLE</div><div class="line">    A thread executing in the Java virtual machine is in this state.</div><div class="line">    BLOCKED</div><div class="line">    A thread that is blocked waiting for a monitor lock is in this state.</div><div class="line">    WAITING</div><div class="line">    A thread that is waiting indefinitely for another thread to perform a particular action is in this state.</div><div class="line">    TIMED_WAITING</div><div class="line">    A thread that is waiting for another thread to perform an action for up to a specified waiting time is in this state.</div><div class="line">    TERMINATED</div><div class="line">    A thread that has exited is in this state.</div><div class="line">      </div><div class="line">A thread can be in only one state at a given point in time. These states are virtual machine states which do not reflect any operating system thread states.</div><div class="line"></div><div class="line">Since:</div><div class="line">1.5</div></pre></td></tr></table></figure>
-<h3 id="Java线程状态迁移"><a href="#Java线程状态迁移" class="headerlink" title="Java线程状态迁移"></a>Java线程状态迁移</h3><p><img src="../images/ThreadStateTransform.png" alt="ThreadStateTranform"></p>
+<p>MySQL 默认的级别是 REPEATABLE READ（可重复读），这表示在 MySQL 的默认情况下，“脏读”、“不可重复读”是不会发生的。这就需要在更新的时候进行必要的锁定（InnoDB 是采用行级锁的方式），从而保证一致性。需要注意的是 InnoDB 的行锁是通过给索引上的索引项加锁来实现的，这个特点意味着：只有通过索引条件检索数据，InnoDB 才使用行级锁，否则，InnoDB 将使用表锁！</p>
+<p>我们数据库表是 InnoDB 引擎的表，而 MySQL 的 InnoDB 引擎是一个支持事务的引擎，其默认操作模式是 autocommit 自动提交模式。什么意思呢？除非我们显式地开始一个事务，否则每个查询都被当做一个单独的事务自动执行。</p>
 
       
     </div>
@@ -416,12 +422,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/JAVA/" rel="tag"># JAVA</a>
-          
-        </div>
-      
 
       
       
@@ -431,15 +431,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2017/08/03/数据库事务/" rel="next" title="数据库事务">
+                <i class="fa fa-chevron-left"></i> 数据库事务
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/08/02/数据结构与算法/" rel="prev" title="数据结构与算法">
-                数据结构与算法 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -559,7 +559,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#虚拟机线程状态-vs-操作系统线程状态"><span class="nav-number">2.</span> <span class="nav-text">虚拟机线程状态 vs 操作系统线程状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java线程状态"><span class="nav-number">3.</span> <span class="nav-text">Java线程状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java线程状态迁移"><span class="nav-number">4.</span> <span class="nav-text">Java线程状态迁移</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Spring事务传播性"><span class="nav-number">1.</span> <span class="nav-text">Spring事务传播性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#事务隔离级别"><span class="nav-number">2.</span> <span class="nav-text">事务隔离级别</span></a></li></ol></div>
             
 
           </div>
