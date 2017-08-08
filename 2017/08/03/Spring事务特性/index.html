@@ -77,7 +77,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Spring, 事务," />
 
 
 
@@ -94,14 +94,15 @@
 
 
 <meta name="description" content="Spring事务传播性 A (Atomacity)  原子性 一个事务（transaction）中的所有操作，要么全部完成，要么全部不完成，不会结束在中间某个环节。事务在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。  C (Consistency) 一致性 在事务开始之前和事务结束以后，数据库的完整性没有被破坏。这表示写入的资料必须完全符合所">
+<meta name="keywords" content="Spring, 事务">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数据库事务">
+<meta property="og:title" content="Spring事务特性">
 <meta property="og:url" content="http://charleywu.com/2017/08/03/Spring事务特性/index.html">
 <meta property="og:site_name" content="TickTock Ideas">
 <meta property="og:description" content="Spring事务传播性 A (Atomacity)  原子性 一个事务（transaction）中的所有操作，要么全部完成，要么全部不完成，不会结束在中间某个环节。事务在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。  C (Consistency) 一致性 在事务开始之前和事务结束以后，数据库的完整性没有被破坏。这表示写入的资料必须完全符合所">
-<meta property="og:updated_time" content="2017-08-07T08:26:56.000Z">
+<meta property="og:updated_time" content="2017-08-08T06:27:37.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="数据库事务">
+<meta name="twitter:title" content="Spring事务特性">
 <meta name="twitter:description" content="Spring事务传播性 A (Atomacity)  原子性 一个事务（transaction）中的所有操作，要么全部完成，要么全部不完成，不会结束在中间某个环节。事务在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。  C (Consistency) 一致性 在事务开始之前和事务结束以后，数据库的完整性没有被破坏。这表示写入的资料必须完全符合所">
 
 
@@ -136,7 +137,7 @@
 
 
 
-  <title>数据库事务 | TickTock Ideas</title>
+  <title>Spring事务特性 | TickTock Ideas</title>
   
 
 
@@ -202,7 +203,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
-            Home
+            Accueil
           </a>
         </li>
       
@@ -272,7 +273,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">数据库事务</h1>
+          <h1 class="post-title" itemprop="name headline">Spring事务特性</h1>
         
 
         <div class="post-meta">
@@ -282,7 +283,7 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">Posté le</span>
               
               <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-03T10:03:46+08:00">
                 2017-08-03
@@ -422,6 +423,12 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/Spring-事务/" rel="tag"># Spring, 事务</a>
+          
+        </div>
+      
 
       
       
@@ -488,10 +495,10 @@
       
         <ul class="sidebar-nav motion-element">
           <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            Table of Contents
+            Table Des Matières
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview">
-            Overview
+            Ensemble
           </li>
         </ul>
       
@@ -511,8 +518,8 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">4</span>
-                <span class="site-state-item-name">posts</span>
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">articles</span>
               </a>
             </div>
           
@@ -524,7 +531,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">tags</span>
               
             </div>
@@ -595,7 +602,7 @@
 </div>
 
 <div class="theme-info">
-  Theme -
+  Thème -
   <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
     NexT.Muse
   </a>
