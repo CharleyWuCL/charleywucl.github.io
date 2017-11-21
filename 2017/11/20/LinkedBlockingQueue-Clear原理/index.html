@@ -77,7 +77,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="JAVA," />
 
 
 
@@ -93,12 +93,13 @@
 
 
 
-<meta name="description" content="LinkedBlockingQueue Clear()原理准备123456789101112131415161718public class LinkedBlockingQueueTest &amp;#123;  private LinkedBlockingQueue&amp;lt;Integer&amp;gt; queue = new LinkedBlockingQueue&amp;lt;&amp;gt;();  @Before  p">
+<meta name="description" content="准备123456789101112131415161718public class LinkedBlockingQueueTest &amp;#123;  private LinkedBlockingQueue&amp;lt;Integer&amp;gt; queue = new LinkedBlockingQueue&amp;lt;&amp;gt;();  @Before  public void setUp() &amp;#123;">
+<meta name="keywords" content="JAVA">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TickTock Ideas">
-<meta property="og:url" content="http://charleywu.com/2017/11/21/LinkedBlockingQueue-Clear原理/index.html">
+<meta property="og:title" content="LinkedBlockingQueue Clear()原理">
+<meta property="og:url" content="http://charleywu.com/2017/11/20/LinkedBlockingQueue-Clear原理/index.html">
 <meta property="og:site_name" content="TickTock Ideas">
-<meta property="og:description" content="LinkedBlockingQueue Clear()原理准备123456789101112131415161718public class LinkedBlockingQueueTest &amp;#123;  private LinkedBlockingQueue&amp;lt;Integer&amp;gt; queue = new LinkedBlockingQueue&amp;lt;&amp;gt;();  @Before  p">
+<meta property="og:description" content="准备123456789101112131415161718public class LinkedBlockingQueueTest &amp;#123;  private LinkedBlockingQueue&amp;lt;Integer&amp;gt; queue = new LinkedBlockingQueue&amp;lt;&amp;gt;();  @Before  public void setUp() &amp;#123;">
 <meta property="og:image" content="https://charleywucl.github.io/images/blog/queue/LinkedBlockingQueue-clear-setp1.png">
 <meta property="og:image" content="https://charleywucl.github.io/images/blog/queue/LinkedBlockingQueue-clear-setp2.png">
 <meta property="og:image" content="https://charleywucl.github.io/images/blog/queue/LinkedBlockingQueue-clear-setp3.png">
@@ -107,10 +108,10 @@
 <meta property="og:image" content="https://charleywucl.github.io/images/blog/queue/LinkedBlockingQueue-clear-setp6.png">
 <meta property="og:image" content="https://charleywucl.github.io/images/blog/queue/LinkedBlockingQueue-clear-setp7.png">
 <meta property="og:image" content="https://charleywucl.github.io/images/blog/queue/LinkedBlockingQueue-clear-setp8.png">
-<meta property="og:updated_time" content="2017-11-21T10:13:15.042Z">
+<meta property="og:updated_time" content="2017-11-21T10:16:39.536Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="TickTock Ideas">
-<meta name="twitter:description" content="LinkedBlockingQueue Clear()原理准备123456789101112131415161718public class LinkedBlockingQueueTest &amp;#123;  private LinkedBlockingQueue&amp;lt;Integer&amp;gt; queue = new LinkedBlockingQueue&amp;lt;&amp;gt;();  @Before  p">
+<meta name="twitter:title" content="LinkedBlockingQueue Clear()原理">
+<meta name="twitter:description" content="准备123456789101112131415161718public class LinkedBlockingQueueTest &amp;#123;  private LinkedBlockingQueue&amp;lt;Integer&amp;gt; queue = new LinkedBlockingQueue&amp;lt;&amp;gt;();  @Before  public void setUp() &amp;#123;">
 <meta name="twitter:image" content="https://charleywucl.github.io/images/blog/queue/LinkedBlockingQueue-clear-setp1.png">
 
 
@@ -139,13 +140,13 @@
 
 
 
-  <link rel="canonical" href="http://charleywu.com/2017/11/21/LinkedBlockingQueue-Clear原理/"/>
+  <link rel="canonical" href="http://charleywu.com/2017/11/20/LinkedBlockingQueue-Clear原理/"/>
 
 
 
 
 
-  <title> | TickTock Ideas</title>
+  <title>LinkedBlockingQueue Clear()原理 | TickTock Ideas</title>
   
 
 
@@ -264,7 +265,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://charleywu.com/2017/11/21/LinkedBlockingQueue-Clear原理/">
+    <link itemprop="mainEntityOfPage" href="http://charleywu.com/2017/11/20/LinkedBlockingQueue-Clear原理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Charley Wu">
@@ -281,7 +282,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline"></h1>
+          <h1 class="post-title" itemprop="name headline">LinkedBlockingQueue Clear()原理</h1>
         
 
         <div class="post-meta">
@@ -293,8 +294,8 @@
               
                 <span class="post-meta-item-text">Veröffentlicht am</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-21T18:00:10+08:00">
-                2017-11-21
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-20T18:16:00+08:00">
+                2017-11-20
               </time>
             
 
@@ -328,7 +329,7 @@
       
 
       
-        <h2 id="LinkedBlockingQueue-Clear-原理"><a href="#LinkedBlockingQueue-Clear-原理" class="headerlink" title="LinkedBlockingQueue Clear()原理"></a>LinkedBlockingQueue Clear()原理</h2><h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LinkedBlockingQueueTest</span> </span>&#123;</div><div class="line">  <span class="keyword">private</span> LinkedBlockingQueue&lt;Integer&gt; queue = <span class="keyword">new</span> LinkedBlockingQueue&lt;&gt;();</div><div class="line">  <span class="meta">@Before</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUp</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">      queue.put(<span class="number">10</span>);</div><div class="line">      queue.put(<span class="number">20</span>);</div><div class="line">      queue.put(<span class="number">30</span>);</div><div class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">      e.printStackTrace();</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  </div><div class="line">  <span class="meta">@Test</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testClear</span><span class="params">()</span></span>&#123;</div><div class="line">    queue.clear();</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+        <h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LinkedBlockingQueueTest</span> </span>&#123;</div><div class="line">  <span class="keyword">private</span> LinkedBlockingQueue&lt;Integer&gt; queue = <span class="keyword">new</span> LinkedBlockingQueue&lt;&gt;();</div><div class="line">  <span class="meta">@Before</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUp</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">      queue.put(<span class="number">10</span>);</div><div class="line">      queue.put(<span class="number">20</span>);</div><div class="line">      queue.put(<span class="number">30</span>);</div><div class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">      e.printStackTrace();</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  </div><div class="line">  <span class="meta">@Test</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testClear</span><span class="params">()</span></span>&#123;</div><div class="line">    queue.clear();</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>创建一个阻塞队列，然后进行清空；</p>
 <p>###源码</p>
 <p>LinkedBlockingQueue Clear()源码如下：</p>
@@ -374,6 +375,12 @@
     </div>
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JAVA/" rel="tag"># JAVA</a>
+          
+        </div>
       
 
       
@@ -512,7 +519,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#LinkedBlockingQueue-Clear-原理"><span class="nav-number">1.</span> <span class="nav-text">LinkedBlockingQueue Clear()原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#准备"><span class="nav-number">1.1.</span> <span class="nav-text">准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#过程演示"><span class="nav-number">1.2.</span> <span class="nav-text">过程演示</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-1-新建队列："><span class="nav-number">1.2.1.</span> <span class="nav-text">Step-1 新建队列：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-7-执行循环体直至最后一个节点："><span class="nav-number">1.2.2.</span> <span class="nav-text">Step-7 执行循环体直至最后一个节点：</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#准备"><span class="nav-number">1.</span> <span class="nav-text">准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#过程演示"><span class="nav-number">2.</span> <span class="nav-text">过程演示</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-1-新建队列："><span class="nav-number">2.1.</span> <span class="nav-text">Step-1 新建队列：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-7-执行循环体直至最后一个节点："><span class="nav-number">2.2.</span> <span class="nav-text">Step-7 执行循环体直至最后一个节点：</span></a></li></ol></li></ol></div>
             
 
           </div>
