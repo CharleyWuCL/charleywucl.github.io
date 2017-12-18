@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://charleywu.com/2017/12/15/CPU%E5%8D%A0%E7%94%A8%E8%BF%87%E9%AB%98%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/</loc>
+    
+    <lastmod>2017-12-17T08:57:51.144Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://charleywu.com/2017/12/17/JVM%E5%85%B3%E9%94%AE%E7%9F%A5%E8%AF%86%E7%82%B9%E5%9B%BE%E8%A7%A3/</loc>
+    
+    <lastmod>2017-12-17T08:52:28.526Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://charleywu.com/2017/12/07/Alibaba%E9%9D%A2%E8%AF%95%E9%A2%98/</loc>
     
     <lastmod>2017-12-07T08:18:20.580Z</lastmod>
@@ -19,13 +33,6 @@
     <loc>http://charleywu.com/2017/07/27/Java%E7%BA%BF%E7%A8%8B%E6%B5%85%E6%9E%90/</loc>
     
     <lastmod>2017-11-23T10:07:04.491Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://charleywu.com/2016/06/06/%E6%88%91%E7%9A%84%E7%AE%80%E5%8E%86/</loc>
-    
-    <lastmod>2017-11-23T10:06:16.793Z</lastmod>
     
   </url>
   
