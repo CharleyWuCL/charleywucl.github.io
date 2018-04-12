@@ -1,0 +1,91 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> Kafka概述 · TickTock Ideas</title><meta name="description" content="Kafka概述 - Charley Wu"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://charleywu.com/atom.xml" title="TickTock Ideas"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="https://github.com/CharleyWuCL" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">Kafka概述</h1><div class="post-info">Apr 12, 2018</div><div class="post-content"><p>kafka是一个分布式的，可分区的，可备份的日志提交服务，它使用独特的设计实现了一个消息系统的功能。</p>
+<a id="more"></a>
+<blockquote>
+<p>Kafka is a distributed, partitioned, replicated commit log service. It provides the functionality of a messaging system, but with a unique design.</p>
+</blockquote>
+<p><strong>专业术语</strong></p>
+<ul>
+<li><strong>Topic</strong>：指Kafka处理的消息源的不同分类；</li>
+<li><strong>Partition</strong>：Topic物理上的分组，一个topic可以设置为多个partition，每个partition都是一个有序的队列，partition中的每条消息都会被分配一个有序的id（offset）；</li>
+<li><strong>Message</strong>：消息，是通信的基本单位，每个producer可以向一个topic（主题）发送一些消息；</li>
+<li><strong>Producers</strong>：消息生产者，即向Kafka的一个topic发送消息（producer可以选择向topic哪一个partition发送数据）。</li>
+<li><strong>Consumers</strong>：消息消费者，接收topics并处理其发布的消息，同一个topic的数据可以被多个consumer接收；</li>
+<li><strong>Broker</strong>：缓存代理，Kafka集群中的一台或多台服务器统称为broker。</li>
+</ul>
+<p><strong>使用场景</strong></p>
+<ul>
+<li>作为消息系统：具备两个重要模块，队列与发布-订阅。能够保证消息严格有序，通过partition增加并行度。</li>
+<li>作为存储系统：多备份，大容量存储特性，使Kafka能够成为一种高性能、低延迟、具备日志存储、备份和传播功能的分布式文件系统。</li>
+<li>作为流处理平台：从输入Topic取数据，经过聚合、join等复杂处理后再写入输出Topic。</li>
+</ul>
+<p><strong>基础架构</strong></p>
+<p>Kafka集群典型架构：</p>
+<p><img src="http://matt33.com/images/2015-11-14-kafka-introduce/kafka.png" alt="kafka"></p>
+<p>消息生产与消费模式：</p>
+<p><img src="http://matt33.com/images/2015-11-14-kafka-introduce/pull.png" alt="pull"></p>
+<h3 id="快速使用"><a href="#快速使用" class="headerlink" title="快速使用"></a>快速使用</h3><p><strong>Step1 下载压缩包</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> tar -xzf kafka_2.11-1.1.0.tgz</div><div class="line"><span class="meta">&gt;</span> cd kafka_2.11-1.1.0</div></pre></td></tr></table></figure>
+<p><strong>Step2 启动服务</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> bin/zookeeper-server-start.sh config/zookeeper.properties</div><div class="line"><span class="meta">&gt;</span> bin/kafka-server-start.sh config/server.properties</div></pre></td></tr></table></figure>
+<p><strong>Step3 创建Topic</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>Create</div><div class="line"><span class="meta">&gt;</span> bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test</div><div class="line"><span class="meta">#</span>List</div><div class="line"><span class="meta">&gt;</span> bin/kafka-topics.sh --list --zookeeper localhost:2181</div></pre></td></tr></table></figure>
+<p><strong>Step4 生产消息</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test</div><div class="line">This is a message</div></pre></td></tr></table></figure>
+<p><strong>Step5 消费消息</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning</div></pre></td></tr></table></figure>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><p><strong>Java参数</strong></p>
+<p>JDK8且使用G1垃圾收集器</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">-Xmx6g -Xms6g -XX:MetaspaceSize=96m -XX:+UseG1GC</div><div class="line">-XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M</div><div class="line">-XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80</div></pre></td></tr></table></figure>
+<p><strong>操作系统</strong></p>
+<ul>
+<li>低CPU，高内存</li>
+<li>文件描述符限制100k+</li>
+<li>文件系统： EXT 或 XFS</li>
+</ul>
+<p><strong>Broker重要配置</strong></p>
+<ul>
+<li><code>log.retention.{ms, minutes, hours}</code>：日志保存时长，默认7天。</li>
+<li><code>log.retention.bytes</code>：日志删除的尺寸阈值，默认无阈值。</li>
+<li><code>message.max.bytes</code>：允许的最大的一个批次的消息大小。</li>
+<li><code>delete.topic.enable</code>：默认为 false，是否允许通过 admin tool 来删除 topic；</li>
+<li><code>min.insync.replicas</code> = 2：当 Producer 的 acks 设置为 all 或 -1 时，<code>min.insync.replicas</code> 代表了必须进行确认的最小 replica 数，如果不够的话 Producer 将会报 <code>NotEnoughReplicas</code> 或 <code>NotEnoughReplicasAfterAppend</code> 异常；</li>
+<li><code>zookeeper.session.timeout.ms</code> ：zookeeper会话超时时间，默认6s，建议设置为30s；</li>
+<li><code>num.io.threads</code>：默认为8，KafkaRequestHandlerPool 的大小。</li>
+</ul>
+<p><strong>Producer重要配置</strong></p>
+<ul>
+<li><code>batch.size</code>：该值设置越大，吞吐越大，但延迟也会越大；</li>
+<li><code>linger.ms</code>：表示 batch 的超时时间，该值越大，吞吐越大、但延迟也会越大；</li>
+<li><code>max.in.flight.requests.per.connection</code>：默认为5，表示 client 在 blocking 之前向单个连接（broker）发送的未确认请求的最大数，超过1时，将会影响数据的顺序性；</li>
+<li><code>compression.type</code>：压缩设置，会提高吞吐量；</li>
+<li><code>acks</code>：此配置是 Producer 在确认一个请求发送完成之前需要收到的反馈信息的数量。 这个参数是为了保证发送请求的可靠性。以下配置方式是允许的：<ul>
+<li><code>acks=0</code> 如果设置为0，则 producer 不会等待服务器的反馈。该消息会被立刻添加到 socket buffer 中并认为已经发送完成。在这种情况下，服务器是否收到请求是没法保证的，并且参数<code>retries</code>也不会生效（因为客户端无法获得失败信息）。每个记录返回的 offset 总是被设置为-1。</li>
+<li><code>acks=1</code> 如果设置为1，leader节点会将记录写入本地日志，并且在所有 follower 节点反馈之前就先确认成功。在这种情况下，如果 leader 节点在接收记录之后，并且在 follower 节点复制数据完成之前产生错误，则这条记录会丢失。</li>
+<li><code>acks=all</code> 如果设置为all，这就意味着 leader 节点会等待所有同步中的副本确认之后再确认这条记录是否发送完成。只要至少有一个同步副本存在，记录就不会丢失。这种方式是对请求传递的最有效保证。acks=-1与acks=all是等效的。</li>
+</ul>
+</li>
+</ul>
+<p><strong>Consumer重要配置</strong></p>
+<ul>
+<li><code>fetch.min.bytes</code> ：消费批次大小。</li>
+<li><code>fetch.max.wait.ms</code>：消费批次最大等待时间。</li>
+<li><code>max.poll.interval.ms</code>：调用 <code>poll()</code> 之后延迟的最大时间，超过这个时间没有调用 <code>poll()</code> 的话，就会认为这个 consumer 挂掉了，将会进行 rebalance；</li>
+<li><code>max.poll.records</code>：当调用 <code>poll()</code> 之后返回最大的 record 数，默认为500；</li>
+<li><code>session.timeout.ms</code>：会话超时时间；</li>
+</ul>
+<h3 id="关于Partition"><a href="#关于Partition" class="headerlink" title="关于Partition"></a>关于Partition</h3><p>Consumer group中消费者实例与partition关系是：</p>
+<ul>
+<li>如果group中的consumer数小于topic中的partition数，那么group中的consumer就会消费多个partition；</li>
+<li>如果group中的consumer数等于topic中的partition数，那么group中的一个consumer就会消费topic中的一个partition；</li>
+<li>如果group中的consumer数大于topic中的partition数，那么group中就会有一部分的consumer处于空闲状态。</li>
+</ul>
+<p><img src="http://matt33.com/images/2015-11-14-kafka-introduce/consumerGroup.png" alt="consumerGroup"></p>
+<h3 id="关于Replication"><a href="#关于Replication" class="headerlink" title="关于Replication"></a>关于Replication</h3><p>Kafka的副本多少决定于几个参数</p>
+<ul>
+<li>broker中<code>default.replication.factor</code></li>
+<li>topic中<code>--replicated-factor</code>，此值会覆盖broker配置里的默认值</li>
+</ul>
+<p>示例：</p>
+<p><img src="http://colobu.com/2017/11/02/kafka-replication/kafka_replication_diagram.png" alt="img"></p>
+<p>上图中有四个broker,一个topic,2个分区，复制因子是3。当producer发送一个消息的时候，它会选择一个分区，比如<code>topic1-part1</code>分区，将消息发送给这个分区的leader， broker2、broker3会拉取这个消息，一旦消息被拉取过来，slave会发送ack给master，这时候master才commit这个log。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2018/04/11/消息中间件选型分析/" class="next">NEXT</a></div><div class="copyright"><p>© 2015 - 2018 <a href="http://charleywu.com">Charley Wu</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>
