@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://charleywu.com/"/>
-  <updated>2018-08-07T14:12:29.427Z</updated>
+  <updated>2018-08-08T04:22:25.502Z</updated>
   <id>http://charleywu.com/</id>
   
   <author>
@@ -15,6 +15,26 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Hexo Apollo主题使用Gitment评论系统</title>
+    <link href="http://charleywu.com/2018/08/08/Hexo-Apollo%E4%B8%BB%E9%A2%98%E4%BD%BF%E7%94%A8Gitment%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/"/>
+    <id>http://charleywu.com/2018/08/08/Hexo-Apollo主题使用Gitment评论系统/</id>
+    <published>2018-08-08T04:04:38.000Z</published>
+    <updated>2018-08-08T04:22:25.502Z</updated>
+    
+    <content type="html"><![CDATA[<p>此博客系统使用的是基于Giuhub的Hexo生成的静态页面，一直想用Github的Issues作为评论系统，无意中发现Gitment就是基于这个理念开发的，因此做一个集成，实施步骤如下。</p><a id="more"></a><h3 id="Github授权接入"><a href="#Github授权接入" class="headerlink" title="Github授权接入"></a>Github授权接入</h3>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;此博客系统使用的是基于Giuhub的Hexo生成的静态页面，一直想用Github的Issues作为评论系统，无意中发现Gitment就是基于这个理念开发的，因此做一个集成，实施步骤如下。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Hexo" scheme="http://charleywu.com/tags/Hexo/"/>
+    
+  </entry>
   
   <entry>
     <title>Spring cloud zookeeper配置中心搭建</title>

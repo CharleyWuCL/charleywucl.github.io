@@ -88,4 +88,13 @@
 <p>示例：</p>
 <p><img src="http://colobu.com/2017/11/02/kafka-replication/kafka_replication_diagram.png" alt="img"></p>
 <p>上图中有四个broker,一个topic,2个分区，复制因子是3。当producer发送一个消息的时候，它会选择一个分区，比如<code>topic1-part1</code>分区，将消息发送给这个分区的leader， broker2、broker3会拉取这个消息，一旦消息被拉取过来，slave会发送ack给master，这时候master才commit这个log。</p>
-</div></article></div></main><footer><div class="paginator"><a href="/2018/08/07/Spring-cloud-zookeeper配置中心搭建/" class="prev">PREV</a><a href="/2018/04/11/消息中间件选型分析/" class="next">NEXT</a></div><div class="copyright"><p>© 2015 - 2018 <a href="http://charleywu.com">Charley Wu</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>
+</div></article></div></main><footer><div class="paginator"><a href="/2018/08/07/Spring-cloud-zookeeper配置中心搭建/" class="prev">PREV</a><a href="/2018/04/11/消息中间件选型分析/" class="next">NEXT</a></div><div id="container"></div><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"><script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script><script>var gitment = new Gitment({
+    id: 'Thu Apr 12 2018 09:48:56 GMT+0800',
+    owner: 'CharleyWuCL',
+    repo: 'charleywucl.github.io',
+    oauth: {
+        client_id: 'a3aebd7727cc175c2796',
+        client_secret: '130cd80e9084e3fcd78d7dffd34c497c96f5b2cd',
+    },
+})
+gitment.render('container')</script><div class="copyright"><p>© 2015 - 2018 <a href="http://charleywu.com">Charley Wu</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>
