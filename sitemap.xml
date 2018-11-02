@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://charleywu.com/2018/08/07/Spring-cloud-zookeeper%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83%E6%90%AD%E5%BB%BA/</loc>
+    
+    <lastmod>2018-11-02T07:28:51.831Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://charleywu.com/2018/10/30/Spring-Cloud-Config%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83%E6%B5%85%E6%9E%90/</loc>
     
-    <lastmod>2018-10-30T12:40:36.146Z</lastmod>
+    <lastmod>2018-11-02T07:28:29.753Z</lastmod>
     
   </url>
   
@@ -19,13 +26,6 @@
     <loc>http://charleywu.com/2018/08/13/Java%E5%B8%B8%E7%94%A8%E9%9B%86%E5%90%88%E6%95%B4%E7%90%86/</loc>
     
     <lastmod>2018-08-13T12:20:07.230Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://charleywu.com/2018/08/07/Spring-cloud-zookeeper%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83%E6%90%AD%E5%BB%BA/</loc>
-    
-    <lastmod>2018-08-09T01:47:18.732Z</lastmod>
     
   </url>
   
