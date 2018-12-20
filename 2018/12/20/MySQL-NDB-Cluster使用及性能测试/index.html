@@ -1,4 +1,408 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> MySQL NDB Cluster使用及性能测试 · TickTock Ideas</title><meta name="description" content="MySQL NDB Cluster使用及性能测试 - Charley Wu"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://charleywu.com/atom.xml" title="TickTock Ideas"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="https://github.com/CharleyWuCL" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">MySQL NDB Cluster使用及性能测试</h1><div class="post-info">Dec 20, 2018</div><div class="post-content"></div></article></div></main><footer><div class="paginator"><a href="/2018/11/02/Java线程池总结/" class="next">NEXT</a></div><div id="container"></div><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"><script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script><script>var gitment = new Gitment({
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> MySQL NDB Cluster使用及性能测试 · TickTock Ideas</title><meta name="description" content="MySQL NDB Cluster使用及性能测试 - Charley Wu"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://charleywu.com/atom.xml" title="TickTock Ideas"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="https://github.com/CharleyWuCL" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">MySQL NDB Cluster使用及性能测试</h1><div class="post-info">Dec 20, 2018</div><div class="post-content"><p>MySQL集群是一种在无共享架构（SNA，Share Nothing Architecture）系统里应用内存数据库集群的技术。这种无共享的架构可以使得系统使用低廉的硬件获取高的可扩展性。<br>MySQL集群是一种分布式设计，目标是要达到没有任何单点故障点。因此，任何组成部分都应该拥有自己的内存和磁盘。任何共享存储方案如网络共享，网络文件系统和SAN设备是不推荐或不支持的。通过这种冗余设计，MySQL声称数据的可用度可以达到99.999%。<br>实际上，MySQL集群是把一个叫做NDB的内存集群存储引擎集成与标准的MySQL服务器集成。它包含一组计算机，每个都跑一个或者多个进程，这可能包括一个MySQL服务器，一个数据节点，一个管理服务器和一个专有的一个数据访问程序。</p>
+<a id="more"></a>
+<h3 id="概念介绍"><a href="#概念介绍" class="headerlink" title="概念介绍"></a>概念介绍</h3><h4 id="成员角色"><a href="#成员角色" class="headerlink" title="成员角色"></a>成员角色</h4><ul>
+<li><p><strong>管理节点（MGM）</strong><br>用来实现整个集群的管理，理论上一般只启动一个，而且宕机也不影响 cluster 的服务，这个进程只在cluster 启动以及节点加入集群时起作用， 所以这个节点不是很需要冗余，理论上通过一台服务器提供服务就可以了。通过 ndb_mgmd 命令启动，使用 config.ini 配置文件。</p>
+</li>
+<li><p><strong>数据节点（NDB）</strong><br>用来存储数据，可以和管理节点(MGM)、 用户端节点(API)处在不同的机器上，也可以在同一个机器上面，集群中至少要有一个DB节点，2个以上 时就能实现集群的高可用保证，DB节点增加时，集群的处理速度会变慢。通过 ndbd 命令启动，第一次创建好cluster DB 节点时，需要使用 –init参数初始化。</p>
+</li>
+<li><p><strong>客户端节点（API）</strong><br>通过他实现 Cluster DB 的访问，这个节点也可以是普通的 mysqld 进程，也可以是空节点，提供给外界连接，如JAVA程序。 需要在配置文件中配置ndbcluster 指令打开 NDB Cluster storage engine 存储引擎，增加 API 节点会提高整个集群的并发访问速度和整体的吞吐量，该节点 可以部署在Web应用服务器上，也可以部署在专用的服务器上，也开以和DB部署在 同一台服务器上。</p>
+</li>
+</ul>
+<h4 id="网络拓扑"><a href="#网络拓扑" class="headerlink" title="网络拓扑"></a>网络拓扑</h4><p><img src="https://dev.mysql.com/doc/refman/5.7/en/images/multi-comp-1.png" alt="ndb"></p>
+<h3 id="NDB安装"><a href="#NDB安装" class="headerlink" title="NDB安装"></a>NDB安装</h3><p>这里使用<code>Auto-Installer</code>安装工具安装，自带GUI操作界面，比较方便。</p>
+<p><strong>下载地址</strong></p>
+<p>请根据MySQL版本下载对应的NDB安装包，目前</p>
+<p>地址：<a href="https://dev.mysql.com/downloads/cluster/" target="_blank" rel="external">https://dev.mysql.com/downloads/cluster/</a></p>
+<p>包：mysql-cluster-community-7.6.8-1.el7.x86_64.rpm-bundle.tar，mysql-cluster-gpl-7.6.8-el7-x86_64.tar.gz</p>
+<p><strong>安装步骤</strong></p>
+<ul>
+<li><p>解压两个包</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> tar -xf mysql-cluster-community-7.6.8-1.el7.x86_64.rpm-bundle.tar</div><div class="line"><span class="meta">$</span> tar -zxf mysql-cluster-gpl-7.6.8-el7-x86_64.tar.gz</div></pre></td></tr></table></figure>
+</li>
+<li><p>删除已有的mysql安装包</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 停止已有的MySQL服务</div><div class="line"><span class="meta">$</span> service mysql stop</div><div class="line"><span class="meta">#</span> 查找rpm包并删除</div><div class="line"><span class="meta">$</span> rpm -qa | grep -i mysql</div><div class="line"><span class="meta">$</span> rpm -ev &lt;包名&gt; --nodeps</div><div class="line"><span class="meta">#</span> 查找遗留文件并删除</div><div class="line"><span class="meta">$</span> whereis mysql</div><div class="line"><span class="meta">$</span> find / -name mysql</div></pre></td></tr></table></figure>
+</li>
+<li><p>安装Auto Installer工具并启动，安装过程中会需要其他依赖包，按提示安装即可</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> yum install mysql-cluster-community-common-7.6.8-1.el7.x86_64.rpm</div><div class="line"><span class="meta">$</span> yum install mysql-cluster-community-libs-7.6.8-1.el7.x86_64.rpm</div><div class="line"><span class="meta">$</span> yum install mysql-cluster-community-client-7.6.8-1.el7.x86_64.rpm</div><div class="line"><span class="meta">$</span> yum install mysql-cluster-community-server-7.6.8-1.el7.x86_64.rpm</div><div class="line"><span class="meta">$</span> yum install mysql-cluster-community-auto-installer-7.6.8-1.el7.x86_64.rpm</div></pre></td></tr></table></figure>
+</li>
+<li><p>将必要的文件拷到相应目录下</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> cd /mysql-cluster-gpl-7.5.12-el7-x86_64</div><div class="line"><span class="meta">$</span> cp bin/ndb_mgm* /usr/local/bin</div><div class="line"><span class="meta">$</span> cp bin/ndbmtd  /usr/local/bin</div><div class="line"><span class="meta">$</span> cp bin/mysqld  /usr/local/bin</div><div class="line"><span class="meta">$</span> cd /usr/local/bin</div><div class="line"><span class="meta">$</span> chmod +x ndb_mgm*</div><div class="line"><span class="meta">$</span> chmod +x ndbmtd</div><div class="line"><span class="meta">$</span> chmod +x mysqld</div></pre></td></tr></table></figure>
+</li>
+<li><p>创建<code>mysql</code>用户及组</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> groupadd mysql</div><div class="line"><span class="meta">$</span> useradd -g mysql mysql</div><div class="line"><span class="meta">#</span> 设置密码，mysql/mysql</div><div class="line"><span class="meta">$</span> passwd mysql</div></pre></td></tr></table></figure>
+</li>
+<li><p>启动<code>auto-installer</code>安装工具</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> ./usr/bin/ndb_setup.py</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><strong>Auto-Installer图形化安装步骤</strong></p>
+<ul>
+<li><p>第一次登陆输入一个密码，这里随便填，并且需要填写一个配置文件名，随便填，如test。</p>
+<p><img src="https://raw.githubusercontent.com/CharleyWuCL/charleywucl.github.io/master/images/blog/ndb/auto-installer-1.png" alt=""></p>
+</li>
+<li><p>填写集群内机器IP及登陆方式，其他默认即可。</p>
+<p><img src="https://raw.githubusercontent.com/CharleyWuCL/charleywucl.github.io/master/images/blog/ndb/auto-installer-2.png" alt=""></p>
+</li>
+<li><p>连接主机成功后会显示主机信息。</p>
+<p><img src="https://raw.githubusercontent.com/CharleyWuCL/charleywucl.github.io/master/images/blog/ndb/auto-installer-3.png" alt=""></p>
+</li>
+<li><p>节点管理，可以创建或删除节点。</p>
+<p><img src="https://raw.githubusercontent.com/CharleyWuCL/charleywucl.github.io/master/images/blog/ndb/auto-installer-4.png" alt=""></p>
+</li>
+<li><p>创建好之后查看节点分布情况以及管理端口目录等等。</p>
+<p><img src="https://raw.githubusercontent.com/CharleyWuCL/charleywucl.github.io/master/images/blog/ndb/auto-installer-5.png" alt=""></p>
+</li>
+<li><p>部署启动或停止集群。</p>
+<p><img src="https://raw.githubusercontent.com/CharleyWuCL/charleywucl.github.io/master/images/blog/ndb/auto-installer-6.png" alt=""></p>
+</li>
+<li><p>各组件运行命令行</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> ndb_mgm</div><div class="line"><span class="meta">$</span> ndb_mgmd --initial --ndb-nodeid=49 --config-dir=/home/mysql/MySQL_Cluster/49/ --config-file=/home/mysql/MySQL_Cluster/49/config.ini</div><div class="line"><span class="meta">#</span> ndbd</div><div class="line"><span class="meta">$</span> ndbmtd --ndb-nodeid=1 --ndb-connectstring=10.182.172.148:1186</div><div class="line"><span class="meta">#</span> mysqld</div><div class="line"><span class="meta">$</span> mysqld --defaults-file=/home/mysql/MySQL_Cluster/54/my.cnf</div></pre></td></tr></table></figure>
+</li>
+<li><p>使用命令行查看集群状态</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> ndb_mgm</div><div class="line">-- NDB Cluster -- Management Client --</div><div class="line"><span class="meta">ndb_mgm&gt;</span> show</div><div class="line">Connected to Management Server at: localhost:1186</div><div class="line">Cluster Configuration</div><div class="line">---------------------</div><div class="line">[ndbd(NDB)]     1 node(s)</div><div class="line">id=1    @10.182.173.158  (mysql-5.7.24 ndb-7.6.8, Nodegroup: 0, *)</div><div class="line"></div><div class="line">[ndb_mgmd(MGM)] 1 node(s)</div><div class="line">id=49   @10.182.173.158  (mysql-5.7.24 ndb-7.6.8)</div><div class="line"></div><div class="line">[mysqld(API)]   3 node(s)</div><div class="line">id=53   @10.182.173.158  (mysql-5.7.24 ndb-7.6.8)</div><div class="line">id=231 (not connected, accepting connect from 10.182.173.158)</div><div class="line">id=233 (not connected, accepting connect from 10.182.173.158)</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><strong>连接Mysql客户端及建库建表</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> root用户默认没有密码</div><div class="line"><span class="meta">$</span> mysql -uroot -p -h 127.0.0.1</div><div class="line"><span class="meta">#</span> 设置root用户密码，密码为root，并开启远程访问权限</div><div class="line"><span class="meta">mysql&gt;</span> update user set password=PASSWORD('root') where User='root';</div><div class="line"><span class="meta">mysql&gt;</span> GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root';</div><div class="line"><span class="meta">mysql&gt;</span> flush privileges;</div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">-- 设置全局存储引擎</div><div class="line">mysql&gt; set default_storage_engine= ndbcluster;</div><div class="line">mysql&gt; show variables like '%default_storage_engine%';</div><div class="line">+------------------------+------------+</div><div class="line">| Variable_name          | Value      |</div><div class="line">+------------------------+------------+</div><div class="line">| default_storage_engine | ndbcluster |</div><div class="line">+------------------------+------------+</div><div class="line"></div><div class="line">-- 建库</div><div class="line">CREATE SCHEMA `ndbtest` DEFAULT CHARACTER SET utf8 ;</div><div class="line">-- 建表</div><div class="line">CREATE TABLE `ndbtest`.`employee` (</div><div class="line">    `id` BIGINT(20) NOT NULL PRIMARY KEY,</div><div class="line">    `first` VARCHAR(64) DEFAULT NULL,</div><div class="line">    `last` VARCHAR(64) DEFAULT NULL,</div><div class="line">    `municipality` VARCHAR(64) DEFAULT NULL,</div><div class="line">    `started` DATE DEFAULT NULL,</div><div class="line">    `ended` DATE DEFAULT NULL,</div><div class="line">    `department` INT NOT NULL DEFAULT 1,</div><div class="line">    -- UNIQUE KEY idx_u_hash (`last`,`first`) USING HASH,</div><div class="line">    KEY idx_municipality (`municipality`)</div><div class="line">) ENGINE=NDBCLUSTER;</div></pre></td></tr></table></figure>
+<h3 id="ClusterJ-API-使用"><a href="#ClusterJ-API-使用" class="headerlink" title="ClusterJ API 使用"></a>ClusterJ API 使用</h3><p><strong>概念介绍</strong></p>
+<p>详见官方文档：<a href="https://dev.mysql.com/doc/ndbapi/en/mccj-overview-clusterj-object-models.html" target="_blank" rel="external">The ClusterJ API and Data Object Model</a></p>
+<p><strong>接口定义</strong></p>
+<p>定义一个数据库对象接口，不用的字段可以不映射。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@PersistenceCapable</span>(table = <span class="string">"employee"</span>)</div><div class="line"><span class="meta">@Index</span>(name = <span class="string">"PRIMARY"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Employee</span> </span>&#123;</div><div class="line">  <span class="meta">@PrimaryKey</span></div><div class="line">  <span class="function"><span class="keyword">long</span> <span class="title">getId</span><span class="params">()</span></span>;</div><div class="line">  <span class="function"><span class="keyword">void</span> <span class="title">setId</span><span class="params">(<span class="keyword">long</span> id)</span></span>;</div><div class="line"></div><div class="line">  <span class="function">String <span class="title">getFirst</span><span class="params">()</span></span>;</div><div class="line">  <span class="function"><span class="keyword">void</span> <span class="title">setFirst</span><span class="params">(String first)</span></span>;</div><div class="line"></div><div class="line">  <span class="function">String <span class="title">getLast</span><span class="params">()</span></span>;</div><div class="line">  <span class="function"><span class="keyword">void</span> <span class="title">setLast</span><span class="params">(String last)</span></span>;</div><div class="line"></div><div class="line">  <span class="meta">@Column</span>(name = <span class="string">"municipality"</span>)</div><div class="line">  <span class="meta">@Index</span>(name = <span class="string">"idx_municipality"</span>)</div><div class="line">  <span class="function">String <span class="title">getCity</span><span class="params">()</span></span>;</div><div class="line">  <span class="function"><span class="keyword">void</span> <span class="title">setCity</span><span class="params">(String city)</span></span>;</div><div class="line"></div><div class="line">  <span class="function">Date <span class="title">getStarted</span><span class="params">()</span></span>;</div><div class="line">  <span class="function"><span class="keyword">void</span> <span class="title">setStarted</span><span class="params">(Date date)</span></span>;</div><div class="line"></div><div class="line">  <span class="function">Date <span class="title">getEnded</span><span class="params">()</span></span>;</div><div class="line">  <span class="function"><span class="keyword">void</span> <span class="title">setEnded</span><span class="params">(Date date)</span></span>;</div><div class="line"></div><div class="line">  <span class="function">Integer <span class="title">getDepartment</span><span class="params">()</span></span>;</div><div class="line">  <span class="function"><span class="keyword">void</span> <span class="title">setDepartment</span><span class="params">(Integer department)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>基础用法</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Example</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        <span class="comment">//初始化Session Factory</span></div><div class="line">        Map&lt;String, String&gt; props = <span class="keyword">new</span> HashMap&lt;&gt;();</div><div class="line">        props.put(<span class="string">"com.mysql.clusterj.connectstring"</span>, <span class="string">"127.0.0.1:1186"</span>);</div><div class="line">        props.put(<span class="string">"com.mysql.clusterj.database"</span>, <span class="string">"ndbtest"</span>);</div><div class="line">        <span class="comment">//API Node Id</span></div><div class="line">        props.put(<span class="string">"com.mysql.clusterj.connection.pool.nodeids"</span>, <span class="string">"53"</span>);</div><div class="line">        SessionFactory factory = ClusterJHelper.getSessionFactory(props);</div><div class="line">        Session session = factory.getSession();</div><div class="line">        </div><div class="line">        <span class="comment">//Insert</span></div><div class="line">        Employee newEmployee = session.newInstance(Employee.class);</div><div class="line">        newEmployee.setId(<span class="number">1</span>);</div><div class="line">        newEmployee.setFirst(<span class="string">"John"</span>);</div><div class="line">    	newEmployee.setLast(<span class="string">"Jones"</span>);</div><div class="line">        newEmployee.setCity(<span class="string">"municipality"</span>);</div><div class="line">        session.persist(employee);</div><div class="line">        </div><div class="line">        <span class="comment">//Select</span></div><div class="line">        Employee employee = session.find(Employee.class, <span class="number">1</span>);</div><div class="line">    	employee.getFirst();</div><div class="line">        </div><div class="line">        <span class="comment">//Update</span></div><div class="line">        Employee employee = session.find(Employee.class, <span class="number">1</span>);</div><div class="line">        employee.setFirst(<span class="string">"Updated"</span>);</div><div class="line">        employee.setLast(<span class="string">"Updated"</span>);</div><div class="line">        session.updatePersistent(employee);</div><div class="line">        </div><div class="line">        <span class="comment">//Delete</span></div><div class="line">        Employee employee = session.find(Employee.class, <span class="number">1</span>);</div><div class="line">        session.deletePersistent(employee);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>高级使用</strong></p>
+<p>可以做批量插入、删除、修改、<code>QueryBuilder</code>等操作。</p>
+<p>详见官方文档：<a href="https://dev.mysql.com/doc/ndbapi/en/mccj-using-clusterj.html" target="_blank" rel="external">Usage of ClusterJ</a></p>
+<h3 id="JDBC使用"><a href="#JDBC使用" class="headerlink" title="JDBC使用"></a>JDBC使用</h3><p>因为集群提供了<code>Mysqld</code>服务，所以我们可以通过传统JDBC方式接入NDB集群。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Example</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> SQL = <span class="string">"select * from employee where id = ?;"</span>；</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        HikariConfig config = <span class="keyword">new</span> HikariConfig();</div><div class="line">        config.setJdbcUrl(<span class="string">"jdbc:mysql://127.0.0.1:3306/ndbtest"</span>);</div><div class="line">        config.setUsername(<span class="string">"root"</span>);</div><div class="line">        config.setPassword(<span class="string">"root"</span>);</div><div class="line">        config.setAutoCommit(<span class="keyword">true</span>);</div><div class="line">        config.setMaximumPoolSize(<span class="number">64</span>);</div><div class="line">        config.addDataSourceProperty(<span class="string">"cachePrepStmts"</span>, <span class="string">"true"</span>);</div><div class="line">        config.addDataSourceProperty(<span class="string">"prepStmtCacheSize"</span>, <span class="string">"250"</span>);</div><div class="line">        config.addDataSourceProperty(<span class="string">"prepStmtCacheSqlLimit"</span>, <span class="string">"2048"</span>);</div><div class="line">        HikariDataSource dataSource = <span class="keyword">new</span> HikariDataSource(config);</div><div class="line">        </div><div class="line">        <span class="keyword">try</span> (</div><div class="line">            Connection conn = dataSource.getConnection();</div><div class="line">            PreparedStatement statement = conn.prepareStatement(SQL);</div><div class="line">        ) &#123;</div><div class="line">          statement.setLong(<span class="number">1</span>, <span class="number">12</span>);</div><div class="line">          statement.executeQuery();</div><div class="line">        &#125; <span class="keyword">catch</span> (SQLException e) &#123;</div><div class="line">          e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="性能测试"><a href="#性能测试" class="headerlink" title="性能测试"></a>性能测试</h3><p>本次性能测试只比较同等条件下，Mysql Cluster NDB的两种Java访问方式的性能差异，并不涉及NDB与单Mysql实例的性能对比。</p>
+<p><strong>NDB集群主机配置</strong></p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>参数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主机类型</td>
+<td>虚拟机</td>
+</tr>
+<tr>
+<td>操作系统</td>
+<td>Oracle Linux 7</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>4核</td>
+</tr>
+<tr>
+<td>内存</td>
+<td>12G</td>
+</tr>
+<tr>
+<td>磁盘</td>
+<td>10G</td>
+</tr>
+</tbody>
+</table>
+<p><strong>测试程序主机配置</strong></p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>参数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主机类型</td>
+<td>虚拟机</td>
+</tr>
+<tr>
+<td>操作系统</td>
+<td>Oracle Linux 7</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>4核</td>
+</tr>
+<tr>
+<td>内存</td>
+<td>8G</td>
+</tr>
+<tr>
+<td>磁盘</td>
+<td>10G</td>
+</tr>
+</tbody>
+</table>
+<h3 id="测试背景"><a href="#测试背景" class="headerlink" title="测试背景"></a>测试背景</h3><p>为检测NDB的<code>Java</code>两种访问方式的效率，故通过<code>Jmeter</code>工具分别对<code>ClusterJ</code>、<code>JDBC</code>进行性能测试对比。为保证两种方式的对等性，<code>ClusterJ</code>只连一个API Node节点，并设置<code>Session</code>最大事务数为64；JDBC只连一个<code>Mysqld</code>服务端，并设置连接池大小为64.</p>
+<p><strong>系统架构图</strong></p>
+<p>ClusterJ是通过JNI接口直接与NDB的数据节点交互，而JDBC则需要通过Mysqld服务进行数据操作。因此理论上ClusterJ的效率要好与JDBC。</p>
+<p><img src="https://raw.githubusercontent.com/CharleyWuCL/charleywucl.github.io/master/images/blog/ndb/arch.png" alt=""></p>
+<p><strong>ClusterJ测试工程</strong></p>
+<p>参数配置：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Map&lt;String, String&gt; props = <span class="keyword">new</span> HashMap&lt;&gt;();</div><div class="line">props.put(<span class="string">"com.mysql.clusterj.connectstring"</span>, <span class="string">"127.0.0.1:1186"</span>);</div><div class="line">props.put(<span class="string">"com.mysql.clusterj.database"</span>, <span class="string">"ndbtest"</span>);</div><div class="line">props.put(<span class="string">"com.mysql.clusterj.connection.pool.nodeids"</span>, <span class="string">"53"</span>);</div><div class="line">props.put(<span class="string">"com.mysql.clusterj.max.transactions"</span>, <span class="string">"64"</span>);</div></pre></td></tr></table></figure>
+<p>核心代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractBeanMark</span> <span class="keyword">extends</span> <span class="title">AbstractJavaSamplerClient</span> </span>&#123;</div><div class="line"></div><div class="line">  <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">final</span> AtomicLong ID = <span class="keyword">new</span> AtomicLong(<span class="number">1</span>);</div><div class="line">  <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">final</span> SessionFactory factory = NdbServer.instance().getFactory();</div><div class="line">  <span class="keyword">private</span> ThreadLocal&lt;Session&gt; threadLocal = ThreadLocal.withInitial(() -&gt; factory.getSession());</div><div class="line"></div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> SampleResult <span class="title">runTest</span><span class="params">(JavaSamplerContext javaSamplerContext)</span> </span>&#123;</div><div class="line">    SampleResult sampleResult = <span class="keyword">new</span> SampleResult();</div><div class="line">    sampleResult.sampleStart();</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">      doTest(threadLocal.get());</div><div class="line">      sampleResult.setSuccessful(<span class="keyword">true</span>);</div><div class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">      e.printStackTrace();</div><div class="line">      sampleResult.setSuccessful(<span class="keyword">false</span>);</div><div class="line">    &#125;</div><div class="line">    sampleResult.sampleEnd();</div><div class="line">    <span class="keyword">return</span> sampleResult;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">doTest</span><span class="params">(Session session)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>JDBC测试工程</strong></p>
+<p>参数配置：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">HikariConfig config = <span class="keyword">new</span> HikariConfig();</div><div class="line">config.setJdbcUrl(<span class="string">"jdbc:mysql://127.0.0.1:3306/ndbtest"</span>);</div><div class="line">config.setUsername(<span class="string">"root"</span>);</div><div class="line">config.setPassword(<span class="string">"root"</span>);</div><div class="line">config.setAutoCommit(<span class="keyword">true</span>);</div><div class="line">config.setMaximumPoolSize(<span class="number">64</span>);</div><div class="line">config.addDataSourceProperty(<span class="string">"cachePrepStmts"</span>, <span class="string">"true"</span>);</div><div class="line">config.addDataSourceProperty(<span class="string">"prepStmtCacheSize"</span>, <span class="string">"250"</span>);</div><div class="line">config.addDataSourceProperty(<span class="string">"prepStmtCacheSqlLimit"</span>, <span class="string">"2048"</span>);</div></pre></td></tr></table></figure>
+<p>核心代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractBeanMark</span> <span class="keyword">extends</span> <span class="title">AbstractJavaSamplerClient</span> </span>&#123;</div><div class="line"></div><div class="line">  <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">final</span> AtomicLong ID = <span class="keyword">new</span> AtomicLong(<span class="number">1</span>);</div><div class="line">  <span class="keyword">protected</span> <span class="keyword">final</span> HikariDataSource dataSource = DataSourceHolder.instance().getDataSource();</div><div class="line"></div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> SampleResult <span class="title">runTest</span><span class="params">(JavaSamplerContext javaSamplerContext)</span> </span>&#123;</div><div class="line">    SampleResult sampleResult = <span class="keyword">new</span> SampleResult();</div><div class="line">    sampleResult.sampleStart();</div><div class="line">    <span class="keyword">try</span> (</div><div class="line">        Connection conn = dataSource.getConnection();</div><div class="line">        PreparedStatement statement = conn.prepareStatement(sql());</div><div class="line">    ) &#123;</div><div class="line">      doTest(statement);</div><div class="line">      sampleResult.setSuccessful(<span class="keyword">true</span>);</div><div class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">      e.printStackTrace();</div><div class="line">      sampleResult.setSuccessful(<span class="keyword">false</span>);</div><div class="line">    &#125;</div><div class="line">    sampleResult.sampleEnd();</div><div class="line">    <span class="keyword">return</span> sampleResult;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">abstract</span> String <span class="title">sql</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">doTest</span><span class="params">(PreparedStatement statement)</span> <span class="keyword">throws</span> SQLException</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="测试结果"><a href="#测试结果" class="headerlink" title="测试结果"></a>测试结果</h3><p><strong>基础数据</strong></p>
+<p>ClusterJ访问方式CRUD随线程增加TPS变化数据</p>
+<table>
+<thead>
+<tr>
+<th>Thread Nums</th>
+<th>1</th>
+<th>2</th>
+<th>4</th>
+<th>8</th>
+<th>16</th>
+<th>32</th>
+<th>64</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Insert</td>
+<td>785.5</td>
+<td>1910.4</td>
+<td>4379.1</td>
+<td>8067.3</td>
+<td>14347.7</td>
+<td>23840.8</td>
+<td>32547.4</td>
+</tr>
+<tr>
+<td>Select</td>
+<td>2513.3</td>
+<td>5834.3</td>
+<td>10168.1</td>
+<td>19461.6</td>
+<td>31622.1</td>
+<td>39215.3</td>
+<td>42834.8</td>
+</tr>
+<tr>
+<td>Update</td>
+<td>522.4</td>
+<td>1294.4</td>
+<td>3105.4</td>
+<td>5512.4</td>
+<td>9937.7</td>
+<td>16443.7</td>
+<td>24056.1</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td>572.5</td>
+<td>1436.9</td>
+<td>3284.2</td>
+<td>5940.7</td>
+<td>10827.8</td>
+<td>17632.7</td>
+<td>25755.6</td>
+</tr>
+</tbody>
+</table>
+<p>ClusterJ访问方式CRUD随线程增加CUP Load变化数据</p>
+<table>
+<thead>
+<tr>
+<th>Thread   Nums</th>
+<th>1</th>
+<th>2</th>
+<th>4</th>
+<th>8</th>
+<th>16</th>
+<th>32</th>
+<th>64</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Insert</td>
+<td>5.5</td>
+<td>9.5</td>
+<td>18.5</td>
+<td>24.3</td>
+<td>28</td>
+<td>32</td>
+<td>35</td>
+</tr>
+<tr>
+<td>Select</td>
+<td>4</td>
+<td>7</td>
+<td>10</td>
+<td>15</td>
+<td>18.3</td>
+<td>19</td>
+<td>16.3</td>
+</tr>
+<tr>
+<td>Update</td>
+<td>8.5</td>
+<td>16</td>
+<td>18</td>
+<td>24.5</td>
+<td>28.8</td>
+<td>33.8</td>
+<td>37.5</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td>5.5</td>
+<td>11.3</td>
+<td>16</td>
+<td>23.5</td>
+<td>27</td>
+<td>31.3</td>
+<td>38.3</td>
+</tr>
+</tbody>
+</table>
+<p>JDBC访问方式CRUD随线程增加TPS变化数据</p>
+<table>
+<thead>
+<tr>
+<th>Thread Nums</th>
+<th>1</th>
+<th>2</th>
+<th>4</th>
+<th>8</th>
+<th>16</th>
+<th>32</th>
+<th>64</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Insert</td>
+<td>443.2</td>
+<td>1051.3</td>
+<td>2546.3</td>
+<td>5187.9</td>
+<td>9304.8</td>
+<td>14925.8</td>
+<td>21054.6</td>
+</tr>
+<tr>
+<td>Select</td>
+<td>1013.1</td>
+<td>2345.4</td>
+<td>5555.3</td>
+<td>10550.4</td>
+<td>16860.4</td>
+<td>21452.9</td>
+<td>23496.7</td>
+</tr>
+<tr>
+<td>Update</td>
+<td>521.3</td>
+<td>1193.1</td>
+<td>2717.2</td>
+<td>5618.7</td>
+<td>10418</td>
+<td>16751</td>
+<td>23039.1</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td>551.3</td>
+<td>1223.6</td>
+<td>2851.6</td>
+<td>5991.4</td>
+<td>10945</td>
+<td>17887.7</td>
+<td>24930.1</td>
+</tr>
+</tbody>
+</table>
+<p>JDBC访问方式CRUD随线程增加CUP Load变化数据</p>
+<table>
+<thead>
+<tr>
+<th>Thread   Nums</th>
+<th>1</th>
+<th>2</th>
+<th>4</th>
+<th>8</th>
+<th>16</th>
+<th>32</th>
+<th>64</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Insert</td>
+<td>3.8</td>
+<td>7</td>
+<td>12.5</td>
+<td>20</td>
+<td>25</td>
+<td>28.8</td>
+<td>40</td>
+</tr>
+<tr>
+<td>Select</td>
+<td>8.5</td>
+<td>14.5</td>
+<td>26.3</td>
+<td>45</td>
+<td>67.5</td>
+<td>80</td>
+<td>85</td>
+</tr>
+<tr>
+<td>Update</td>
+<td>3</td>
+<td>6</td>
+<td>12.5</td>
+<td>23.8</td>
+<td>40</td>
+<td>65</td>
+<td>77.5</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td>2.8</td>
+<td>6</td>
+<td>12.5</td>
+<td>23.3</td>
+<td>37.3</td>
+<td>57.5</td>
+<td>70</td>
+</tr>
+</tbody>
+</table>
+<p><strong>TPS趋势对比图</strong></p>
+<p>Insert操作</p>
+<p><img src="https://raw.githubusercontent.com/CharleyWuCL/charleywucl.github.io/master/images/blog/ndb/benckmark-tps-insert.png" alt=""></p>
+<p>Select操作</p>
+<p><img src="https://raw.githubusercontent.com/CharleyWuCL/charleywucl.github.io/master/images/blog/ndb/benckmark-tps-select.png" alt=""></p>
+<p>Update操作</p>
+<p><img src="https://raw.githubusercontent.com/CharleyWuCL/charleywucl.github.io/master/images/blog/ndb/benckmark-tps-update.png" alt=""></p>
+<p>Delete操作</p>
+<p><img src="https://raw.githubusercontent.com/CharleyWuCL/charleywucl.github.io/master/images/blog/ndb/benckmark-tps-delete.png" alt=""></p>
+<p><strong>CPU Load趋势图</strong></p>
+<p>ClusterJ CRUD操作</p>
+<p><img src="https://raw.githubusercontent.com/CharleyWuCL/charleywucl.github.io/master/images/blog/ndb/benchmark-cpu-clusterj.png" alt=""></p>
+<p>JDBC CRUD操作</p>
+<p><img src="https://raw.githubusercontent.com/CharleyWuCL/charleywucl.github.io/master/images/blog/ndb/benchmark-cpu-jdbc.png" alt=""></p>
+<h3 id="结论分析"><a href="#结论分析" class="headerlink" title="结论分析"></a>结论分析</h3><p>由上述几张图可知，Select操作ClusterJ方式要比JDBC方式快两倍左右，Insert操作快1.5倍左右，而Update、Delete操作性能基本相当。</p>
+<p>ClusterJ访问方式基于JNI接口直接访问数据节点NDB Node，因此比JDBC方式效率要高很多。对于Update、Delete操作，ClusterJ需要通过Session先查询出来，然后再对对象进行下一步操作，实际上做了两步操作，因此在效率上比没有出现预想的比JDBC高。</p>
+<p>在测试集群中，NDB Cluster的数据节点有两个，MySQL服务端节点一个。使用ClusterJ是直连数据节点，压力是均匀分布在两台机器上；而通过JDBC连接时，压力全部都在MySQL节点上。因此，使用ClusterJ要比JDBC方式对数据库主机的压力要小得多。</p>
+<p>但是ClusterJ同时只能操作一个表对象，不能进行多张表之间的Join操作，因此局限性也是显而易见的。</p>
+<h3 id="测试源码"><a href="#测试源码" class="headerlink" title="测试源码"></a>测试源码</h3><p>GitHub地址：<a href="https://github.com/CharleyWuCL/ndb-practice" target="_blank" rel="external">ndb-practice</a></p>
+</div></article></div></main><footer><div class="paginator"><a href="/2018/11/02/Java线程池总结/" class="next">NEXT</a></div><div id="container"></div><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"><script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script><script>var gitment = new Gitment({
     id: 'Thu Dec 20 2018 18:04:46 GMT+0800',
     owner: 'CharleyWuCL',
     repo: 'charleywucl.github.io',
