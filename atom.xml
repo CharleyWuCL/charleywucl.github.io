@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://charleywu.com/"/>
-  <updated>2018-11-05T01:52:01.065Z</updated>
+  <updated>2018-12-20T10:04:46.744Z</updated>
   <id>http://charleywu.com/</id>
   
   <author>
@@ -15,6 +15,20 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MySQL NDB Cluster使用及性能测试</title>
+    <link href="http://charleywu.com/2018/12/20/MySQL-NDB-Cluster%E4%BD%BF%E7%94%A8%E5%8F%8A%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/"/>
+    <id>http://charleywu.com/2018/12/20/MySQL-NDB-Cluster使用及性能测试/</id>
+    <published>2018-12-20T10:04:46.000Z</published>
+    <updated>2018-12-20T10:04:46.744Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>Java线程池总结</title>

@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://charleywu.com/2018/12/20/MySQL-NDB-Cluster%E4%BD%BF%E7%94%A8%E5%8F%8A%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/</loc>
+    
+    <lastmod>2018-12-20T10:04:46.744Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://charleywu.com/2018/11/02/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%80%BB%E7%BB%93/</loc>
     
     <lastmod>2018-11-05T01:52:01.065Z</lastmod>
