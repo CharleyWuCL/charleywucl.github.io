@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://charleywu.com/2017/12/17/JVM%E5%85%B3%E9%94%AE%E7%9F%A5%E8%AF%86%E7%82%B9%E5%9B%BE%E8%A7%A3/</loc>
+    
+    <lastmod>2019-01-21T12:57:14.392Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://charleywu.com/2018/12/20/MySQL-NDB-Cluster%E4%BD%BF%E7%94%A8%E5%8F%8A%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/</loc>
     
     <lastmod>2018-12-20T10:35:17.570Z</lastmod>
@@ -75,13 +82,6 @@
     <loc>http://charleywu.com/2017/12/15/CPU%E5%8D%A0%E7%94%A8%E8%BF%87%E9%AB%98%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/</loc>
     
     <lastmod>2017-12-18T04:02:19.807Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://charleywu.com/2017/12/17/JVM%E5%85%B3%E9%94%AE%E7%9F%A5%E8%AF%86%E7%82%B9%E5%9B%BE%E8%A7%A3/</loc>
-    
-    <lastmod>2017-12-18T03:47:30.913Z</lastmod>
     
   </url>
   
