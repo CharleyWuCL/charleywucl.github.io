@@ -10,7 +10,7 @@
 <h4 id="标准方差概念"><a href="#标准方差概念" class="headerlink" title="标准方差概念"></a>标准方差概念</h4><p>方差是在概率论和统计方差衡量随机变量或一组数据时离散程度的度量。概率论中方差用来度量随机变量和其数学期望（即均值）之间的偏离程度。统计中的方差（样本方差）是每个样本值与全体样本值的平均数之差的平方值的平均数。公式如下：</p>
 <p><img src="https://raw.githubusercontent.com/CharleyWuCL/variance-performance/master/doc/1-formula.png" alt="img"></p>
 <h4 id="运行方差原理及公式推导"><a href="#运行方差原理及公式推导" class="headerlink" title="运行方差原理及公式推导"></a>运行方差原理及公式推导</h4><p>在计算机编程中，往往需要计算运行方差（running variance），因为样本的个数总是的在不断变化的，确切将是不断递增；如果每次增加，都要重新计算平均值，再按次公式，计算出方差；虽可以实现，但计算量会随着数据的增长变的太大。</p>
-<p>因此，递推的公式就显得格外重要；通过n-1个样本时的方差值<img src="http://static.oschina.net/uploads/space/2012/0219/160726_ZRaf_100580.jpg" alt="img">，和新增的样本<img src="http://static.oschina.net/uploads/space/2012/0219/160833_D7Nt_100580.jpg" alt="img">，就能得到此时这N个样本的方差；这样计算量不会变同时保持在一个很小的值，可大大提高程序的计算效率。递推公式如下：</p>
+<p>因此，递推的公式就显得格外重要；通过n-1个样本时的方差值Sn-1，和新增的样本Xn，就能得到此时这N个样本的方差；这样计算量不会变同时保持在一个很小的值，可大大提高程序的计算效率。递推公式如下：</p>
 <blockquote>
 <p>Mn = Mn-1+ (Xn - Mn-1)/n </p>
 <p>Sn = Sn-1 + (Xn - Mn-1)*(Xn - Mn)</p>
@@ -68,7 +68,7 @@
 <p>测试代码：<a href="https://github.com/CharleyWuCL/variance-performance" target="_blank" rel="external">https://github.com/CharleyWuCL/variance-performance</a></p>
 <h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a href="https://www.johndcook.com/blog/standard_deviation/" target="_blank" rel="external">https://www.johndcook.com/blog/standard_deviation/</a></p>
 <p><a href="https://my.oschina.net/BreathL/blog/41063" target="_blank" rel="external">https://my.oschina.net/BreathL/blog/41063</a></p>
-</div></article></div></main><footer><div class="paginator"><a href="/2018/12/20/MySQL-NDB-Cluster使用及性能测试/" class="next">下一篇</a></div><div id="container"></div><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"><script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script><script>var gitment = new Gitment({
+</div></article></div></main><footer><div class="paginator"><a href="/2018/12/20/MySQL-NDB-Cluster使用及性能测试/" class="next">NEXT</a></div><div id="container"></div><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"><script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script><script>var gitment = new Gitment({
     id: 'Thu Mar 26 2020 17:34:12 GMT+0800',
     owner: 'CharleyWuCL',
     repo: 'charleywucl.github.io',

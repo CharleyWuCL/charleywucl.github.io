@@ -76,7 +76,7 @@
 </ul>
 <p>MySQL 默认的级别是 REPEATABLE READ（可重复读），这表示在 MySQL 的默认情况下，“脏读”、“不可重复读”是不会发生的。这就需要在更新的时候进行必要的锁定（InnoDB 是采用行级锁的方式），从而保证一致性。需要注意的是 InnoDB 的行锁是通过给索引上的索引项加锁来实现的，这个特点意味着：只有通过索引条件检索数据，InnoDB 才使用行级锁，否则，InnoDB 将使用表锁！</p>
 <p>我们数据库表是 InnoDB 引擎的表，而 MySQL 的 InnoDB 引擎是一个支持事务的引擎，其默认操作模式是 autocommit 自动提交模式。什么意思呢？除非我们显式地开始一个事务，否则每个查询都被当做一个单独的事务自动执行。</p>
-</div></article></div></main><footer><div class="paginator"><a href="/2017/11/21/LinkedBlockingQueue-Clear原理/" class="prev">上一篇</a><a href="/2017/08/02/数据结构与算法/" class="next">下一篇</a></div><div id="container"></div><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"><script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script><script>var gitment = new Gitment({
+</div></article></div></main><footer><div class="paginator"><a href="/2017/11/21/LinkedBlockingQueue-Clear原理/" class="prev">PREV</a><a href="/2017/08/02/数据结构与算法/" class="next">NEXT</a></div><div id="container"></div><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"><script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script><script>var gitment = new Gitment({
     id: 'Thu Aug 03 2017 10:03:46 GMT+0800',
     owner: 'CharleyWuCL',
     repo: 'charleywucl.github.io',
