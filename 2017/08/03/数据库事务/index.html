@@ -1,0 +1,88 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 数据库事务 · TickTock Ideas</title><meta name="description" content="数据库事务 - Charley Wu"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://charleywu.com/atom.xml" title="TickTock Ideas"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="https://github.com/CharleyWuCL" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">数据库事务</h1><div class="post-info">Aug 3, 2017</div><div class="post-content"><p>这篇文章对事务的特性以及数据库事务的隔离级别做了简单的归纳总结。</p>
+<a id="more"></a>
+<h3 id="事务的特性-ACID"><a href="#事务的特性-ACID" class="headerlink" title="事务的特性 (ACID)"></a>事务的特性 (ACID)</h3><ul>
+<li><p><strong>A (Atomacity)  原子性</strong></p>
+<p>一个事务（transaction）中的所有操作，要么全部完成，要么全部不完成，不会结束在中间某个环节。事务在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。</p>
+</li>
+<li><p><strong>C (Consistency) 一致性</strong></p>
+<p>在事务开始之前和事务结束以后，数据库的完整性没有被破坏。这表示写入的资料必须完全符合所有的预设规则，这包含资料的精确度、串联性以及后续数据库可以自发性地完成预定的工作。</p>
+</li>
+<li><p><strong>I (Isolation) 隔离性</strong></p>
+<p>数据库允许多个并发事务同时对其数据进行读写和修改的能力，隔离性可以防止多个事务并发执行时由于交叉执行而导致数据的不一致。事务隔离分为不同级别，包括读未提交（Read uncommitted）、读提交（read committed）、可重复读（repeatable read）和串行化（Serializable）。</p>
+</li>
+<li><p><strong>D (Durability) 持久性</strong></p>
+<p>事务处理结束后，对数据的修改就是永久的，即便系统故障也不会丢失。</p>
+</li>
+</ul>
+<h3 id="事务隔离级别"><a href="#事务隔离级别" class="headerlink" title="事务隔离级别"></a>事务隔离级别</h3><p>在标准SQL规范中，定义了4个事务隔离级别，（ Oracle 和 SQL Server 对标准隔离级别有不同的实现 ）</p>
+<ul>
+<li><p><strong>未提交读 (Read Uncommitted)</strong></p>
+<p>直译就是”读未提交”，意思就是即使一个更新语句没有提交，但是别的事务可以读到这个改变。Read Uncommitted允许脏读。</p>
+</li>
+<li><p><strong>已提交读 (Read Committed)</strong></p>
+<p>直译就是”读提交”，意思就是语句提交以后，即执行了 Commit 以后别的事务就能读到这个改变，只能读取到已经提交的数据。Oracle等多数数据库默认都是该级别。Read Commited 不允许脏读，但会出现非重复读。</p>
+</li>
+<li><p><strong>可重复读 (Repeatable Read)</strong></p>
+<p>直译就是”可以重复读”，这是说在同一个事务里面先后执行同一个查询语句的时候，得到的结果是一样的。Repeatable Read 不允许脏读，不允许非重复读，但是会出现幻象读。</p>
+</li>
+</ul>
+<ul>
+<li><p><strong>串行读 (Serializable)</strong></p>
+<p>直译就是”序列化”，意思是说这个事务执行的时候不允许别的事务并发执行。完全串行化的读，每次读都需要获得表级共享锁，读写相互都会阻塞。Serializable 不允许不一致现象的出现。</p>
+<p>​</p>
+</li>
+</ul>
+<p><em>几种隔离级别可能出现的异常场景:</em></p>
+<table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>脏读</th>
+<th>不可重复读</th>
+<th>幻读</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>未提交读</td>
+<td>可能</td>
+<td>可能</td>
+<td>可能</td>
+</tr>
+<tr>
+<td>已提交读</td>
+<td>不可能</td>
+<td>可能</td>
+<td>可能</td>
+</tr>
+<tr>
+<td>可重复读</td>
+<td>不可能</td>
+<td>不可能</td>
+<td>可能</td>
+</tr>
+<tr>
+<td>串行化</td>
+<td>不可能</td>
+<td>不可能</td>
+<td>不可能</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>脏读 (Dirty Read)：</strong>A 事务读到 B 事务未提交的修改。</li>
+<li><strong>不可重复读 (NonRepeatable Read)：</strong>A 事务还没有结束时，B 事务也访问同一数据。在 A 事务的两次读取之间，由于 B 事务的修改，A 事务两次读到的数据可能是不一样的。</li>
+<li><strong>幻读 (Phantom Read)：</strong>A 事务对一个表中的数据进行了修改，这种修改涉及到表中的全部数据行。同时，B 事务也修改这个表中的数据，这种修改是向表中插入一行新数据。操作 A 事务的用户发现表中出现了 B 事务插入的行，就好象发生了幻觉一样。</li>
+</ul>
+<p>MySQL 默认的级别是 REPEATABLE READ（可重复读），这表示在 MySQL 的默认情况下，“脏读”、“不可重复读”是不会发生的。这就需要在更新的时候进行必要的锁定（InnoDB 是采用行级锁的方式），从而保证一致性。需要注意的是 InnoDB 的行锁是通过给索引上的索引项加锁来实现的，这个特点意味着：只有通过索引条件检索数据，InnoDB 才使用行级锁，否则，InnoDB 将使用表锁！</p>
+<p>我们数据库表是 InnoDB 引擎的表，而 MySQL 的 InnoDB 引擎是一个支持事务的引擎，其默认操作模式是 autocommit 自动提交模式。什么意思呢？除非我们显式地开始一个事务，否则每个查询都被当做一个单独的事务自动执行。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2017/11/21/LinkedBlockingQueue-Clear原理/" class="prev">PREV</a><a href="/2017/08/02/数据结构与算法/" class="next">NEXT</a></div><div id="gitalk-container"></div><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script><script>var gitalk = new Gitalk({
+    clientID: 'a3aebd7727cc175c2796',
+    clientSecret: '130cd80e9084e3fcd78d7dffd34c497c96f5b2cd',
+    id: window.location.pathname,
+    repo: 'charleywucl.github.io',
+    owner: 'CharleyWuCL',
+    admin: ['CharleyWu'],
+    distractionFreeMode: false
+})
+gitalk.render('gitalk-container')</script><div class="copyright"><p>© 2015 - 2020 <a href="http://charleywu.com">Charley Wu</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>
